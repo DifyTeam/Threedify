@@ -1,0 +1,506 @@
+.heirarquia {
+  background: #232323;
+  position: fixed;
+  width: 160px;
+  height: 230px;
+  margin-top: 30.5px;
+  right: 0;
+  z-index: 1;
+}
+
+.proprt {
+  background: #232323;
+  width: 100%;
+  height: 23px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.objscts {
+  height: 80%;
+  width: 100%;
+  display: none;
+  overflow-y: auto;
+  flex-direction: column;
+}
+
+
+
+.entity-objto {
+  margin-top: 5px;
+  width: 99%;
+  height: 24px;
+  background: #2A2A2A;
+  border-radius: 2px;
+  border-top: solid 1px #1D1D1D;
+  display: flex;
+  align-items: center;
+  color: #FFFFFF;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+
+.img3 {
+  width: 15px;
+  margin-left: 5px;
+}
+
+
+
+.materr-edit {
+  height: 80%;
+  width: 100%;
+  display: flex;
+  overflow-y: auto;
+  flex-direction: column;
+  overflow-x: none;
+}
+
+
+
+
+
+
+
+/* Remove o estilo padrão do navegador */
+input[type="range"] {
+  -webkit-appearance: none; /* Necessário para Chrome/Safari/Edge */
+  appearance: none;
+  width: 70%; /* Ocupa a largura disponível */
+  height: 22px; /* Altura padrão do Blender */
+  background: transparent; /* Remove fundo padrão */
+  cursor: ew-resize; /* Cursor de "arrastar" lateral */
+  margin: 5px 0; /* Espaçamento simples */
+  overflow: hidden; /* Essencial para o efeito de preenchimento no Chrome */
+  border-radius: 4px; /* Bordas levemente arredondadas */
+  vertical-align: middle;
+}
+
+/* --- Estilo para Chrome, Safari, Edge e Opera --- */
+
+/* O "trilho" (a parte vazia do fundo) */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 22px;
+  background: #2A2A2A; /* Cor cinza escuro de fundo do Blender */
+  border: 2px solid #1D2123; /* Borda sutil escura */
+  border-radius: 4px;
+}
+
+/* O "pegador" (Thumb) - Aqui fazemos a mágica visual */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 22px;
+  width: 0px; /* Largura zero para esconder a "bolinha" */
+  
+  /* TRUQUE DO BLENDER: 
+     Usamos uma sombra gigante para a esquerda para simular a barra cheia.
+     A cor #555555 é o cinza médio padrão de propriedades. 
+     Mude para #4772b3 se quiser aquele azul de seleção.
+  */
+  box-shadow: -100vw 0 0 100vw #22303A; 
+  
+  background: transparent;
+  border: none;
+}
+
+/* Estados de interação (Hover/Focus) */
+input[type="range"]:hover::-webkit-slider-thumb {
+  box-shadow: -100vw 0 0 100vw #22303A; /* Fica mais claro ao passar o mouse */
+}
+
+input[type="range"]:focus {
+  outline: none; /* Remove a borda azul padrão do browser */
+}
+
+/* --- Estilo para Firefox (Mozilla precisa de regras separadas) --- */
+
+/* O "trilho" */
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 22px;
+  background: #2A2A2A;
+  border: 1px solid #131313;
+  border-radius: 4px;
+}
+
+/* A barra de progresso (Firefox tem uma propriedade nativa para isso) */
+input[type="range"]::-moz-range-progress {
+  background: #3A3A3A; /* Cor da barra cheia */
+  height: 22px;
+}
+
+/* O "pegador" */
+input[type="range"]::-moz-range-thumb {
+  width: 0;
+  height: 22px;
+  border: none;
+  background: transparent;
+}
+
+input[type="range"]:hover::-moz-range-progress {
+  background: #3A3A3A;
+}
+
+
+.prop-label{
+  color:#B5B5B5;
+  font-weight: bold;
+}
+
+
+.make-mat{
+  position: fixed;
+  background: #232323;
+  width: 100%;
+  height: 30%;
+  z-index: 1;
+}
+
+.make-mat-btn{
+  background: #1D2123;
+  width: 100%;
+  height: 25px;
+  display: flex;
+  
+}
+
+.propet{
+  background: none;
+  border: none;
+  font-weight: bold;
+  color: #B2B2B2;
+  font-size: 11px;
+  height: 100%;
+}
+
+
+.materials {
+  width: 170px;
+  /* height: 100%;  <-- remove ou comente */
+  height: 80%;      /* opcional: limita sem forçar preenchimento total */
+  overflow-y: auto;
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 por linha */
+  grid-auto-rows: max-content;           /* cada linha só do tamanho do conteúdo */
+  gap: 4px;                              /* espaço horizontal e vertical */
+  justify-items: start;                   /* alinha horizontalmente */
+  align-items: start;                     /* alinha verticalmente */
+}
+
+.matarial-content {
+  background: #262626;
+  border-bottom: solid 2px #1f1f1f;
+  color: #ABABAB;
+  border: none;
+  width: 80px;
+  height: 25px;
+  margin: 0;
+  box-sizing: border-box;
+  
+}
+
+
+.matarial-content:hover{
+  border: solid 1px #743C74;
+}
+
+#materialPreview{
+  margin-left: -10px;
+ 
+}
+
+#color-mat{
+  width: 100px;
+  height: 25px;
+  background: #FFFFFF;
+}
+
+
+.rigthbarv{
+  position: fixed;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: 160px;
+  margin-top: 135px;
+  gap: 5px;
+}
+
+.img5 {
+  width: 28px;
+  
+}
+
+
+
+.objprop{
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  background: #111315;
+  height: 230px;
+  display: none;
+  overflow-y: auto;
+}
+
+#sparet{
+  width: 100%;
+  height: 6px;
+  background: #22272B;
+  margin-top: 5px;
+}
+#sparet2 {
+  width: 100%;
+  height: 18px;
+  background: #111315;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5A5A5A;
+  font-style: italic;
+}
+
+.inp-prop{
+  margin-top: 2px;
+  width: 75%;
+  height: 18px;
+  border: none;
+  outline: none;
+  background: #232629;
+  color: #5A5A5A;
+  border-radius: 3px;
+  margin-bottom: 4px;
+}
+
+#sparet3 {
+  width: 100%;
+  height: 18px;
+  background: #111315;
+  display: flex;
+  align-items: center;
+  color: #383838;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+/* ============================================================
+   PAINEL PRINCIPAL E SCROLL (ESTILO BLENDER)
+============================================================ */
+
+#render_setting,
+#prop-obj,
+.objprop {
+  width: 100%;
+  min-width: 180px;
+  max-width: 180px;
+  background: #111315;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  
+  /* Controle de Scroll */
+  height: 100%;         
+  overflow-y: auto;     
+  overflow-x: hidden;   
+  padding-bottom: 20px; 
+}
+
+/* Estilização da Barra de Rolagem */
+#render_setting::-webkit-scrollbar {
+  width: 8px;
+}
+
+#render_setting::-webkit-scrollbar-track {
+  background: #111315; 
+}
+
+#render_setting::-webkit-scrollbar-thumb {
+  background: #2D2F31; 
+  border-radius: 4px;
+}
+
+#render_setting::-webkit-scrollbar-thumb:hover {
+  background: #3E4144; 
+}
+
+/* ============================================================
+   TÍTULOS, GAVETAS E LABELS
+============================================================ */
+
+#sparet2 {
+  height: 22px;
+  background: #111315;
+  color: #7C7C7C;
+  font-style: italic;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5px;
+}
+
+#sparet3 {
+  height: 22px;
+  padding-left: 20px;
+  background: #1D2123;
+  color: #C1C1C1;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  margin-top: 1px;
+}
+
+/* Seta da Gaveta */
+#sparet3::before {
+  content: "▸";
+  position: absolute;
+  left: 7px;
+  color: #8A8A8A;
+  font-size: 12px;
+  transition: transform 0.12s ease;
+}
+
+#sparet3.open::before {
+  transform: rotate(90deg);
+}
+
+#sparet3:hover {
+  background: #23272A;
+}
+
+.drawer-content {
+  display: none; /* Fechado por padrão como solicitado */
+  background: #111315;
+  padding: 6px 0;
+  border-bottom: 1px solid #1D2123;
+}
+
+.drawer-content.open {
+  display: block;
+}
+
+label {
+  color: #B5B5B5;
+  font-size: 11px;
+  padding-left: 6px;
+  display: block;
+  margin-top: 4px;
+}
+
+/* ============================================================
+   INPUTS E CONTROLES
+============================================================ */
+
+.inp-prop {
+  width: calc(100% - 12px);
+  height: 20px;
+  margin: 2px 6px 6px 6px;
+  background: #232629;
+  border: 1px solid #111315;
+  border-radius: 3px;
+  color: #B5B5B5;
+  font-size: 11px;
+  padding-left: 6px;
+  box-sizing: border-box;
+}
+
+.inp-prop:focus {
+  outline: none;
+  background: #2A2F34;
+  border-color: #4772b3;
+}
+
+input[type="color"] {
+  height: 22px;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+}
+
+.chek {
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* Div de cor personalizada do seu código */
+#color-mat1 {
+  width: calc(100% - 12px);
+  height: 18px;
+  margin: 2px 6px;
+  background-color: #333;
+  border: 1px solid #000;
+  cursor: pointer;
+}
+
+/* ============================================================
+   DROPDOWN DO MUDADOR DE RENDERIZADOR
+============================================================ */
+
+.render-selector-container {
+  padding: 10px 6px;
+  border-bottom: 1px solid #232629;
+}
+
+.custom-select {
+  position: relative;
+  font-size: 11px;
+  color: #E6E6E6;
+  user-select: none;
+}
+
+.select-selected {
+  background-color: #232629;
+  padding: 4px 8px;
+  border-radius: 3px;
+  border: 1px solid #111315;
+  cursor: pointer;
+}
+
+.select-selected:after {
+  content: "▾";
+  position: absolute;
+  right: 10px;
+  top: 4px;
+  font-size: 10px;
+}
+
+.select-items {
+  position: absolute;
+  background-color: #232629;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  border: 1px solid #111315;
+  border-top: none;
+  display: none;
+}
+
+.select-items div {
+  padding: 6px 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #1D2123;
+}
+
+.select-items div:hover {
+  background-color: #4772b3;
+  color: white;
+}
+
+.select-show {
+  display: block;
+}
+
+/* Utilitário para ocultar renderizadores */
+.renderer-hidden {
+  display: none !important;
+}
