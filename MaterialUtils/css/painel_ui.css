@@ -1,0 +1,57 @@
+.tobpar-Mt{
+  position: fixed;
+  width: 120px;
+  height: 140px;
+  z-index: 1;
+  right: 0;
+  margin-right: 140px;
+  margin-top: 30.2px;
+  align-items: center;
+  display: none;
+  
+}
+
+#colorSquare {
+  width: 80%;
+  height: 80%;
+  position: relative;
+  cursor: crosshair;
+  background-size: cover;
+  margin-top: 3px;
+  overflow: hidden;
+}
+
+#colorSlider {
+  width: 80%;
+  height: 20px;
+  margin-top: 10px;
+  position: relative;
+  cursor: pointer;
+  
+}
+
+#sliderHandle {
+  position: absolute;
+  width: 5px;
+  height: 20px;
+  border: 2px solid white;
+  top: -2px;
+  left: 0;
+  pointer-events: none;
+}
+
+#colorDot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid white;
+  border-radius: 50%;
+  transform: translate(-6px, -6px);
+  pointer-events: none;
+}
+
+#hexValue {
+  margin-top: 15px;
+  font-family: monospace;
+  font-size: 20px;
+}
