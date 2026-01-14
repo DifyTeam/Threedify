@@ -1,0 +1,14 @@
+.sencialT{
+  position: fixed;
+  z-index: 99;
+  margin-left: 240px;
+  margin-top: 40px;
+  display: flex;
+  flex-direction: row;
+  
+  
+}
+
+.img7{
+  width: 22px;
+}
