@@ -1,0 +1,201 @@
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  position: fixed;
+  font-family: sans-serif;
+  -webkit-user-select: none;
+  font-size: clamp(14px, 2vw, 18px);
+}
+
+.btn {
+  height: 30px;
+}
+
+.cobtrlss {
+  position: fixed;
+  z-index: 99;
+  display: none;
+}
+
+#renderCanvas {
+  position: fixed;
+  
+  display: none;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.topbar {
+  width: 100vw;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  position: fixed;
+  background: #232323;
+  border-bottom: solid 2px #1f1f1f;
+  z-index: 1;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  font-weight: bold;
+  color: #C1C1C1;
+  margin-left: 5px;
+  display: flex;
+  justify-content: start;
+  font-size: 12px;
+}
+
+.menu-file {
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  background: #232323;
+  margin-top: 30px;
+  gap: 16px;
+  padding-bottom: 20px;
+  padding-top: 5px;
+  display: none;
+  z-index: 8;
+}
+
+.action-btn:active {
+  color: #2C2C2C;
+}
+
+.drop-obj {
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  background: #232323;
+  margin-top: 30px;
+  gap: 16px;
+  padding-bottom: 20px;
+  padding-top: 5px;
+  display: none;
+  z-index: 9;
+}
+
+.generictools {
+  position: fixed;
+  margin-top: 30.5px;
+  padding: 8px;
+  height: 28px;
+  display: flex;
+  background: #232323;
+  flex-direction: row;
+  gap: 20px;
+  
+  z-index: 0;
+}
+
+.img {
+  width: 22px;
+}
+
+.img2 {
+  width: 35px;
+}
+
+.edittools {
+  position: fixed;
+  margin-top: 73px;
+  display: flex;
+  background: #232323;
+  flex-direction: column;
+  padding: 5px;
+  display: none;
+  z-index: 1;
+}
+
+
+.changemode {
+  position: fixed;
+  margin-top: 42px;
+  z-index: 10;
+  margin-left: 130px;
+}
+
+.mode {
+  width: 100px;
+  height: 24px;
+  border: solid 2px #1f1f1f;
+  background: #232323;
+  color: #A3A3A3;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.changemode-menu {
+  position: fixed;
+  margin-top: 68px;
+  z-index: 10;
+  margin-left: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: #232323;
+  padding: 10px;
+  display: none
+}
+
+.mode-change {
+  width: 100px;
+  background: transparent;
+  border: none;
+  color: #A3A3A3;
+  
+}
+
+
+
+.tollaction {
+  position: fixed;
+  display: flex;
+  flex-direction:  column;
+  padding: 5px;
+  background: #232323;
+  display: none;
+  z-index: 1;
+  margin-top: 73px;
+  margin-left: 45px;
+}
+
+.tollaction2 {
+  position: fixed;
+  display: flex;
+  flex-direction: row;
+  bottom: 0;
+  padding: 5px;
+  border: solid 1px #000000;
+  background: #232323;
+  display: none;
+  z-index: 1;
+}
+
+.progresso{
+  position: fixed;
+  z-index: 2;
+  margin-top: 48px;
+  margin-left: 235px;
+  color:#FFFFFF;
+  font-size: 11px;
+}
+
+
+
+.tempb{
+  position: fixed;
+  z-index: 2;
+  margin: 199px;
+}
+
+
+.canvas{
+  width: 100px;
+}

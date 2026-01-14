@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ThreeDify</title>
+  <script src="three.min.js"></script>
+  
+  <link rel="stylesheet" href="style.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="UI/topbar.css" type="text/css" media="all" />
+  
+  <link rel="stylesheet" href="Panel-helper/style.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="MaterialUtils/css/painel_ui.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="renderer/style.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="splash/style.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="console/console.css" type="text/css" media="all" />
+  <link rel="stylesheet" href="UI/estilo_para_barra anti_superior.css" type="text/css" media="all" />
+</head>
+
+<body>
+  
+  
+  <div class="cobtrlss">
+    
+    <button class="btn" id="desativ">desativar</button>
+    <button class="btn" id="ativ">ativar</button>
+    
+    
+    <button class="btn" id="linecut">lineCut</button>
+    
+    
+  </div>
+  <div class="topbar">
+    <button class="action-btn" id="file">File</button>
+    <button class="action-btn" id="add">Add</button>
+    <button class="action-btn" id="undo">desfazer</button>
+    <button class="action-btn" id="redo">refazer</button>
+    <button class="action-btn" id="render" style="display: none;">Render</button>
+    <button class="action-btn" id="render-anim" style="display: none">Render Animation</button>
+    
+    
+    
+  </div>
+  <div class="menu-file" id="file-menu">
+    <button class="action-btn" id="imp-obj">Import-OBJ</button>
+    <button class="action-btn" id="imp-gltf">Import-GLTF</button>
+    
+    <button class="action-btn" id="imp-blend">Save</button>
+    <button class="action-btn" id="salvarBtn" style="display: none;">savePng</button>
+    
+  </div>
+  <div class="drop-obj" id="drop-obj">
+    <button class="action-btn" id="add-box">Box</button>
+    <button class="action-btn" id="add_plan">Plan</button>
+    <button class="action-btn" id="add_ef">Esphere</button>
+    <button class="action-btn" id="add_cill">cylinder</button>
+    <button class="action-btn" id="add_pira">pyramid</button>
+    <button class="action-btn" id="add_mc">Blender monky</button>
+    <button class="action-btn" id="add_spl">Point Light</button>
+    <button class="action-btn" id="add_dtl">Directional Light</button>
+  </div>
+  
+  <div class="generictools">
+    <div class="tol-btn1">
+      <img src="Ui-icon/dir.png" alt="null" class="img" id="mov">
+    </div>
+    <div class="tol-btn1">
+      <img src="Ui-icon/rot.png" alt="null" class="img" id="rot">
+    </div>
+    <div class="tol-btn1">
+      <img src="Ui-icon/sca.png" alt="null" class="img" id="scl">
+    </div>
+  </div>
+  
+  <div class="changemode">
+    <button class="mode" id="modes">object-mode ▼</button>
+  </div>
+  <div class="changemode-menu" id="modos-menu">
+    <button class="mode-change" id="normal">objet-mode</button>
+    <button class="mode-change" id="edição">modeling-mode</button>
+    <button class="mode-change" id="animation-md">animation-mode</button>
+    <button class="mode-change" id="rig-md">rig-mode</button>
+  </div>
+  <div class="sencialT">
+    <img src="Ui-icon/ic_data_matrix_scan.png" alt="null" class="img7" id="baking">
+  </div>
+  
+  
+  <div class="edittools" id="edittools">
+    <div class="tol-btn1">
+      <img src="Ui-icon/vertice.png" alt="null" class="img2" id="vertices">
+    </div>
+    <div class="tol-btn1">
+      <img src="Ui-icon/aresta.png" alt="null" class="img2" id="edges">
+    </div>
+    <div class="tol-btn1">
+      <img src="Ui-icon/face.png" alt="null" class="img2" id="faces">
+    </div>
+  </div>
+  
+  <div class="tollaction" id="tollaction">
+    <div class="tol-btn1">
+      <img src="Ui-icon/extr.png" alt="null" class="img2" id="extrudFace">
+    </div>
+    <div class="tol-btn1">
+      <img src="Ui-icon/sub.png" alt="null" class="img2" id="subdivision">
+    </div>
+    <div class="tol-btn1">
+      <img src="Ui-icon/smoth.png" alt="null" class="img2" id="smoth">
+    </div>
+    
+    <div class="tol-btn1">
+      <img src="Ui-icon/inv.png" alt="null" class="img2" id="invertFace">
+    </div>
+  
+    
+        <div class="tol-btn1">
+      <img src="Ui-icon/chanfro.png" alt="null" class="img2" id="invertFace">
+    </div>
+    
+    <img src="Ui-icon/lp.png" alt="null" class="img2" id="loopcut">
+    <img src="Ui-icon/corte_line.png" alt="null" class="img2" id="loopcut">
+
+  </div>
+  
+  
+  <div class="tollaction2" id="tollaction2">
+    <div class="tol-btn1">
+      <img src="Ui-icon/extr2.png" alt="null" class="img2" id="extrudedge">
+    </div>
+  </div>
+  
+  <div class="rigthbarv">
+    <input type="checkbox" id="multselection" value="" />
+    <img src="Ui-icon/cam.png" alt="null" class="img5" id="cam">
+    <img src="Ui-icon/copy.png" alt="null" class="img5" id="copyyy">
+    <img src="Ui-icon/delete.png" alt="null" class="img5" id="dell">
+  </div>
+  <!------------Hierarquia-------------->
+  <div class="heirarquia" id="heirarquia">
+    <div class="proprt">
+      <button class="propet" id="three">tree</button>
+      <button class="propet" id="mat">Aspc</button>
+      <button class="propet" id="prop">Prop</button>
+      <button class="propet" id="renderS">renderS</button>
+    </div>
+    <div class="objscts" id="hier-three">
+      
+    </div>
+    
+    <div class="objprop" id="prop-obj">
+      <div class="object_prop_more">
+        <div id="sparet2">Inspector</div>
+        <div id="sparet3">Position</div>
+        <input class="inp-prop" type="number" name="atribuits" id="pos_X" value="0" />
+        
+        <input class="inp-prop" type="number" name="atribuits" id="pos_Y" value="0" />
+        
+        <input class="inp-prop" type="number" name="atribuits" id="pos_Z" value="0" />
+        
+        <div id="sparet"></div>
+        <div id="sparet3">Scale</div>
+        <input class="inp-prop" type="number" name="atribuits" id="scaleX" value="0" />
+        
+        <input class="inp-prop" type="number" name="atribuits" id="scaleY" value="0" />
+        
+        <input class="inp-prop" type="number" name="atribuits" id="scaleZ" value="0" />
+        
+        <div id="sparet"></div>
+        <div id="sparet3">Angle</div>
+        <input class="inp-prop" type="number" name="atribuits" id="rotX" value="0" />
+        
+        <input class="inp-prop" type="number" name="atribuits" id="rotY" value="0" />
+        
+        <input class="inp-prop" type="number" name="atribuits" id="rotZ" value="0" />
+        
+      </div>
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    <div id="render_setting">
+      
+      <div id="sparet2">Render Properties</div>
+      
+      <div class="render-selector-container">
+        <label style="margin-bottom:4px;">Render Engine:</label>
+        <div class="custom-select" id="engine-selector">
+          <div class="select-selected">Laziness</div>
+          <div class="select-items">
+            <div data-value="laziness">Laziness</div>
+            <div data-value="iris">IRIS</div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="laziness-controls">
+        
+        <div id="sparet3">Sampling</div>
+        <label>Max Samples:</label>
+        <input class="inp-prop" type="number" id="samples" value="128" />
+        
+        <label>Max Bounces:</label>
+        <input class="inp-prop" type="number" id="maxBounces" value="4" />
+        
+        <label>Adaptive Enabled:</label>
+        <input class="chek" type="checkbox" id="adaptiveEnabled" />
+        
+        <label>Variance Threshold:</label>
+        <input class="inp-prop" type="range" id="varianceThreshold" min="0" max="1" step="0.0001" value="0.01">
+        
+        <div id="sparet3">Film</div>
+        <label>Pixel Ratio:</label>
+        <input class="inp-prop" type="number" id="pixelRatio" value="1" />
+        
+        <label>Background Color:</label>
+        <div id="color-mat1"></div>
+        
+        <div id="sparet3">Camera Effects</div>
+        <label>Aperture:</label>
+        <input class="inp-prop" type="number" id="aperture" value="0.0" step="0.1" />
+        
+        <label>Focus Distance:</label>
+        <input class="inp-prop" type="number" id="focusDistance" value="10.0" />
+        
+        <div id="sparet3">Ambient Occlusion</div>
+        <label>AO Enabled:</label>
+        <input class="chek" type="checkbox" id="aoEnabled_lazy" />
+        
+        <label>AO Samples:</label>
+        <input class="inp-prop" type="number" id="aoSamples" value="16" />
+        
+        <label>AO Radius:</label>
+        <input class="inp-prop" type="number" id="aoRadius" value="1.0" />
+        
+        <label>AO Intensity:</label>
+        <input class="inp-prop" type="number" id="aoIntensity" value="1.0" />
+      </div>
+      
+      <div id="iris-controls" class="renderer-hidden">
+        
+        <div id="sparet3">Lighting & GI</div>
+        <label>Enable GI:</label>
+        <input class="chek" type="checkbox" id="iris_enable_gi" checked />
+        <label>ENABLE_ANTIALIAS:</label>
+        <input class="chek" type="checkbox" id="iris_enable_gi" checked />
+        
+        <label>Light Intensity Factor:</label>
+        <input class="inp-prop" type="number" id="iris_light_intensity" value="0.01" step="0.001" />
+        
+        <label>GI Intensity:</label>
+        <input class="inp-prop" type="number" id="iris_gi_intensity" value="1.0" step="0.1" />
+        
+        <div id="sparet3">Ambient Occlusion (IRIS)</div>
+        <label>Strength:</label>
+        <input class="inp-prop" type="number" id="iris_ao_strength" value="1.5" step="0.1" />
+        
+        <label>Radius:</label>
+        <input class="inp-prop" type="number" id="iris_ao_radius" value="0.03" step="0.01" />
+        
+        <label>Bias:</label>
+        <input class="inp-prop" type="number" id="iris_ao_bias" value="0.01" step="0.001" />
+        
+        <div id="sparet3">Bloom (Post-Process)</div>
+        <label>Enable Bloom:</label>
+        <input class="chek" type="checkbox" id="iris_enable_bloom" checked />
+        
+        <label>Strength:</label>
+        <input class="inp-prop" type="number" id="iris_bloom_strength" value="0.8" step="0.1" />
+        
+        <label>Radius:</label>
+        <input class="inp-prop" type="number" id="iris_bloom_radius" value="0.5" step="0.1" />
+        
+        <label>Threshold:</label>
+        <input class="inp-prop" type="number" id="iris_bloom_threshold" value="1.0" step="0.1" />
+        
+        <label>Mips:</label>
+        <input class="inp-prop" type="number" id="iris_bloom_mips" value="5" step="1" />
+        
+        <div id="sparet3">Sky / Environment</div>
+        <label>Sky Intensity:</label>
+        <input class="inp-prop" type="number" id="iris_sky_intensity" value="0.05" step="0.01" />
+        
+        <label>Sky Mode:</label>
+        <input class="inp-prop" type="text" id="iris_sky_mode" value="unity" readonly style="opacity:0.5" />
+        
+        <label>Top Color:</label>
+        <input class="inp-prop" type="color" id="iris_sky_top" value="#3A4B5C" />
+        
+        <label>Horizon Color:</label>
+        <input class="inp-prop" type="color" id="iris_sky_horizon" value="#85919D" />
+        
+        <label>Bottom Color:</label>
+        <input class="inp-prop" type="color" id="iris_sky_bottom" value="#2D2F31" />
+      </div>
+      
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="materr-edit" id="materr-edit">
+      <canvas id="materialPreview" width="200" height="200"></canvas>
+      
+      <div>
+        <label class="prop-label">Cor:</label>
+        <!--  <input type="color" id="colorInput" value="#ffffff"> -->
+        <div id="color-mat"></div>
+      </div>
+      
+      <div class="prop-label">
+        <label>Roughness:</label>
+        <input type="range" id="roughnessInput" min="0" max="1" step="0.001" value="0">
+      </div>
+      
+      <div class="prop-label">
+        <label>Smooth:</label>
+        <input type="range" id="SmoothInput" min="0" max="1" step="0" value="0">
+      </div>
+      
+      
+      <div class="prop-label">
+        <label>Emission:</label>
+        <input type="range" id="emissionInput" min="0" max="1" step="0.01" value="0">
+      </div>
+      
+      <div class="prop-label">
+        <label>Metalness:</label>
+        <input type="range" id="metalnessInput" min="0" max="10" step="0.001" value="0">
+      </div>
+      
+      <div>
+        <label class="prop-label">Reflection:</label>
+        <input type="range" id="reflectionInput" min="0" max="10" step="0.001" value="0">
+      </div>
+    </div>
+    
+    
+    <div class="make-mat" id="make_mat">
+      <div class="make-mat-btn">
+        <button class="propet" id="add_material">add</button>
+        <button class="propet" id="apply">apply to the selected </button>
+      </div>
+      <div class="materials">
+      </div>
+      
+      
+    </div>
+  </div>
+  
+  
+  
+  
+  <!------------Materia UI-------------->
+  <div class="tobpar-Mt" id="colorPickerContainer">
+    <div id="colorSquare">
+      <div id="colorDot"></div>
+    </div>
+    
+    <div id="colorSlider">
+      <div id="sliderHandle"></div>
+    </div>
+    
+    <div id="hexValue"></div>
+  </div>
+  
+  <div class="console">
+    <div class="console-header">
+      <span>Console</span>
+      <button class="closee">X</button>
+    </div>
+    <div class="log_content" id="log_content"></div>
+    <div class="console-input">
+      <span>&gt;</span>
+      <textarea placeholder="command"></textarea>
+    </div>
+  </div>
+  
+  
+  <div class="splash">
+    <div class="spdiv">
+      <div class="icon_name"><img src="splash/icon.png" class="img80">
+        <h1 class="label1">Threedify5</h1>
+      </div>
+      <div class="data_relase">
+        <span>Version: 0.5.4</span>
+        <span>Build: 2026-01-15</span>
+        <span>Channel: Nandaz Soul</span>
+        <span>Platform: Android</span>
+        <span>engines: IRIS</span>
+      </div>
+      <div class="splash_art">
+        
+        <span>Splash Art: Fernando</span>
+      </div>
+      
+      
+      <div class="img_show"><img src="splash/1.png" id="img"></div>
+      <div class="control_down">
+        <div class="left_menu">
+          <div class="labelm1">
+            <span>New File</span>
+          </div>
+          <div class="btnm1">
+            <div class="labelm1">
+              <img src="splash/ic_package_variant.png" class="img100">
+              <button class="btm">Standard</button>
+            </div>
+            
+            <div class="labelm1">
+              <img src="splash/ic_file_import_outline.png" class="img100">
+              <button class="btm">Open</button>
+            </div>
+            
+            
+          </div>
+        </div>
+        <div class="left_menu">
+          <div class="labelm1">
+            <span>Help</span>
+          </div>
+          <div class="btnm1">
+            <div class="labelm1">
+              <img src="splash/ic_youtube.png" class="img100">
+              <button class="btm">Youtube Tutorial</button>
+            </div>
+           
+            <div class="labelm1">
+              <img src="splash/ic_facebook.png" class="img100">
+              <button class="btm">Facebook</button>
+            </div>
+            
+            
+          </div>
+          <span id="timer">Beta Test Time: 0:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="progresso" id="progresso"></div>
+  <script src="util/undo.js"></script>
+  <script src="libs/index.js"></script>
+  <canvas id="renderCanvas"></canvas>
+  <canvas id="renderCanvas2"></canvas>
+  <canvas class="canvas" id="myCanvas"></canvas>
+  <script src="OrbitControls.js"></script>
+  <script src="OBJLoader.js"></script>
+  <script src="TransformControls4.js"></script>
+  <script src="main.js"></script>
+  <script src="util/primitives.js"></script>
+  <script src="util/importerOBJ.js"></script>
+  <script src="fisica/cannon.min.js"></script>
+  <script src="util/Tranhsform.js"></script>
+  <script src="util/importBlend.js"></script>
+  <script src="libraries for mesh libraries for mesh optimization/three-mesh-bvh.js"></script>
+  
+  <script src="modeling/core.js"></script>
+  <script src="modeling/gizmo.js"></script>
+  <script src="modeling/editState.js"></script>
+  <script src="modeling/geometryUtils.js"></script>
+  <script src="modeling/editMode.js"></script>
+  <script src="modeling/displayHelpers.js"></script>
+  <script src="modeling/selection.js"></script>
+  <script src="modeling/transformUpdate.js"></script>
+  <script src="modeling/editTools.js"></script>
+  <script src="modeling/events.js"></script>
+  
+  
+  
+  <script src="interctive-ui.js"></script>
+  <script src="util/Luzes.js"></script>
+  <script src="teste.js"></script>
+  <script src="renderer/laziness.js"></script>
+  <script src="renderer/iris.js"></script>
+  <script src="renderer/Toom.js"></script>
+  <script src="MaterialUtils/materialUtil.js"></script>
+  <script src="Panel-helper/material-prop.js"></script>
+  <script src="Savepng.js"></script>
+  <script src="Panel-helper/hierarquia.js"></script>
+  <script src="util/inspector-util.js"></script>
+  <script src="util/del-co.js"></script>
+  <script src="renderer/rendererSet.js"></script>
+  <script src="camera/camera.js"></script>
+  <script src="camera/viewhelper.js"></script>
+  <script src="animation-tolls/main.js"></script>
+  <script src="Rig-tolls/rig-core.js"></script>
+  <script src="fisica/tecido.js"></script>
+  <script src="util/probs.js"></script>
+  <script src="util/importerGLTF.js"></script>
+  <script src="console/console.js"></script>
+  <script src="Panel-helper/uitils.js"></script>
+  <script src="splash/main.js"></script>
+</body>
+
+</html>
