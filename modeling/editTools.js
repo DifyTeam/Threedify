@@ -1,5 +1,5 @@
 // ==================================================================================
-// modl.js - UNDO SILENCIOSO, EXTRUDE ESTÁTICO & CORREÇÃO DE SELEÇÃO
+// modl.js - UNDO SILENCIOSO, EXTRUDE ESTÁTICO & CORREÇÃO DE SELEÇÃO & LINE CUT INCLINADO
 // ==================================================================================
 
 // --- Variáveis Globais ---
@@ -21,6 +21,14 @@ let _lcCutFactor = 0.5;
 // Controle de Travamento
 let _lcLockedFaceIdx = -1; 
 let _lcIsDragging = false; 
+
+// --- Variáveis do Line Cut (Traço) ---
+let _lineCutActive = false;
+let _lineCutStart = new THREE.Vector2();
+let _lineCutEnd = new THREE.Vector2();
+let _lineCutCanvas = null;
+let _lineCutCtx = null;
+let _lineCutDrawing = false;
 
 // Cache de vértices para performance
 let _reverseIndexCache = null;
@@ -283,7 +291,7 @@ function reconstruirArestas() {
 }
 
 // ==================================================================================
-// 2. CONTROLES DA FERRAMENTA
+// 2. CONTROLES DA FERRAMENTA LOOP CUT CLÁSSICO
 // ==================================================================================
 
 function ativarLoopCut() {
@@ -640,7 +648,11 @@ function limparLoopCutPreview() {
     }
 }
 
-function _lcAplicarCorte() {
+/**
+ * Aplica o corte.
+ * @param {Map} customEdgeFactors - Opcional. Mapa de [edgeIdx -> factor] para cortes em ângulo.
+ */
+function _lcAplicarCorte(customEdgeFactors = null) {
     if (_lcRingEdges.length === 0) return;
     
     // UNDO: Capturar estado antes
@@ -664,8 +676,17 @@ function _lcAplicarCorte() {
         const p2World = v2.clone().applyMatrix4(matWorld);
         const dirCurr = new THREE.Vector3().subVectors(p2World, p1World).normalize();
 
-        const dot = dirBase.dot(dirCurr);
-        const t = (dot >= 0) ? _lcCutFactor : (1.0 - _lcCutFactor);
+        // LÓGICA DE FATOR DO CORTE:
+        let t = 0.5;
+
+        if (customEdgeFactors && customEdgeFactors.has(eIdx)) {
+            // Se foi passado um fator customizado (Line Cut Inclinado), usa ele.
+            t = customEdgeFactors.get(eIdx);
+        } else {
+            // Loop Cut Normal: Baseado no produto escalar para direção
+            const dot = dirBase.dot(dirCurr);
+            t = (dot >= 0) ? _lcCutFactor : (1.0 - _lcCutFactor);
+        }
 
         const newPos = new THREE.Vector3().lerpVectors(v1, v2, t);
         const newIdx = uniqueVertices.length;
@@ -1172,3 +1193,383 @@ function alternarSelecaoFace(faceIndex) {
         }
     }
 }
+
+// ==================================================================================
+// 8. FERRAMENTA LINE CUT (TRAÇO) - COMPLETAMENTE REFEITO
+// ==================================================================================
+
+/**
+ * Ativa a ferramenta de corte por traço.
+ * NOVA ABORDAGEM: Usa projeção 3D mais precisa e follow-path em todas as arestas visíveis.
+ */
+function ativarLineCut() {
+    if (modoAtual !== 'edicao') { alert("Entre no modo de edição!"); return; }
+    if (!window.editingMesh) return;
+
+    _lineCutActive = true;
+    _lineCutDrawing = false;
+    
+    // Desativa controles de câmera
+    if (typeof window.setOrbitControls === 'function') window.setOrbitControls(false);
+    else if (window.controls) window.controls.enabled = false;
+    if (window.transformControl) window.transformControl.detach();
+
+    // Cria/Mostra Canvas Overlay para o traço branco
+    if (!_lineCutCanvas) {
+        _lineCutCanvas = document.createElement('canvas');
+        _lineCutCanvas.style.position = 'absolute';
+        _lineCutCanvas.style.top = '0';
+        _lineCutCanvas.style.left = '0';
+        _lineCutCanvas.style.width = '100%';
+        _lineCutCanvas.style.height = '100%';
+        _lineCutCanvas.style.pointerEvents = 'none';
+        _lineCutCanvas.style.zIndex = '9999';
+        document.body.appendChild(_lineCutCanvas);
+        _lineCutCtx = _lineCutCanvas.getContext('2d');
+    }
+    _lineCutCanvas.style.display = 'block';
+    
+    // Redimensiona canvas
+    const rect = renderer.domElement.getBoundingClientRect();
+    _lineCutCanvas.width = rect.width;
+    _lineCutCanvas.height = rect.height;
+
+    // Listeners
+    const canvas = renderer.domElement;
+    canvas.addEventListener('pointerdown', _lcTraceDown, { passive: false });
+    canvas.addEventListener('pointermove', _lcTraceMove, { passive: false });
+    canvas.addEventListener('pointerup', _lcTraceUp, { passive: false });
+    canvas.addEventListener('touchstart', _lcTraceDown, { passive: false });
+    canvas.addEventListener('touchmove', _lcTraceMove, { passive: false });
+    canvas.addEventListener('touchend', _lcTraceUp, { passive: false });
+
+    console.log("✏️ Line Cut (V2): Desenhe uma linha sobre o modelo.");
+}
+
+function desativarLineCut() {
+    _lineCutActive = false;
+    if (_lineCutCanvas) _lineCutCanvas.style.display = 'none';
+
+    const canvas = renderer.domElement;
+    canvas.removeEventListener('pointerdown', _lcTraceDown);
+    canvas.removeEventListener('pointermove', _lcTraceMove);
+    canvas.removeEventListener('pointerup', _lcTraceUp);
+    canvas.removeEventListener('touchstart', _lcTraceDown);
+    canvas.removeEventListener('touchmove', _lcTraceMove);
+    canvas.removeEventListener('touchend', _lcTraceUp);
+
+    if (typeof window.setOrbitControls === 'function') window.setOrbitControls(true);
+    else if (window.controls) window.controls.enabled = true;
+}
+
+function _lcTraceDown(event) {
+    if (!_lineCutActive) return;
+    
+    let cx = event.clientX;
+    let cy = event.clientY;
+    if (event.touches && event.touches.length > 0) {
+        cx = event.touches[0].clientX;
+        cy = event.touches[0].clientY;
+    }
+    
+    const rect = renderer.domElement.getBoundingClientRect();
+    _lineCutStart.set(cx - rect.left, cy - rect.top);
+    _lineCutEnd.copy(_lineCutStart);
+    _lineCutDrawing = true;
+    
+    // Limpa canvas
+    if (_lineCutCtx) {
+        _lineCutCtx.clearRect(0, 0, _lineCutCanvas.width, _lineCutCanvas.height);
+    }
+}
+
+function _lcTraceMove(event) {
+    if (!_lineCutActive || !_lineCutDrawing) return;
+    if(event.cancelable) event.preventDefault();
+
+    let cx = event.clientX;
+    let cy = event.clientY;
+    if (event.changedTouches && event.changedTouches.length > 0) {
+        cx = event.changedTouches[0].clientX;
+        cy = event.changedTouches[0].clientY;
+    } else if (event.touches && event.touches.length > 0) {
+        cx = event.touches[0].clientX;
+        cy = event.touches[0].clientY;
+    }
+
+    const rect = renderer.domElement.getBoundingClientRect();
+    _lineCutEnd.set(cx - rect.left, cy - rect.top);
+
+    // Desenha a linha branca
+    if (_lineCutCtx) {
+        _lineCutCtx.clearRect(0, 0, _lineCutCanvas.width, _lineCutCanvas.height);
+        _lineCutCtx.beginPath();
+        _lineCutCtx.moveTo(_lineCutStart.x, _lineCutStart.y);
+        _lineCutCtx.lineTo(_lineCutEnd.x, _lineCutEnd.y);
+        _lineCutCtx.strokeStyle = 'white';
+        _lineCutCtx.lineWidth = 3;
+        _lineCutCtx.stroke();
+    }
+}
+
+function _lcTraceUp(event) {
+    if (!_lineCutActive || !_lineCutDrawing) return;
+    _lineCutDrawing = false;
+
+    const rect = renderer.domElement.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+
+    // Verifica se a linha desenhada é muito pequena
+    const lineLength = Math.sqrt(
+        (_lineCutEnd.x - _lineCutStart.x) ** 2 + 
+        (_lineCutEnd.y - _lineCutStart.y) ** 2
+    );
+    
+    if (lineLength < 20) {
+        console.log("⚠️ Linha muito pequena, tente novamente.");
+        if (_lineCutCtx) _lineCutCtx.clearRect(0, 0, _lineCutCanvas.width, _lineCutCanvas.height);
+        desativarLineCut();
+        return;
+    }
+
+    // NOVA ABORDAGEM: Encontra TODAS as arestas que cruzam com a linha desenhada
+    reconstruirArestas();
+    
+    const matWorld = window.editingMesh.matrixWorld;
+    const crossedEdges = new Map(); // Map<edgeIdx, factor>
+    
+    // 1. Itera por TODAS as arestas do modelo
+    for (let eIdx = 0; eIdx < edges.length; eIdx++) {
+        const e = edges[eIdx];
+        if (!e) continue;
+        
+        // Projeta os vértices da aresta para coordenadas 2D de tela
+        const v1World = uniqueVertices[e[0]].clone().applyMatrix4(matWorld);
+        const v2World = uniqueVertices[e[1]].clone().applyMatrix4(matWorld);
+        
+        const v1Screen = v1World.clone().project(camera);
+        const v2Screen = v2World.clone().project(camera);
+        
+        // Converte NDC para pixels
+        const x1 = (v1Screen.x * 0.5 + 0.5) * w;
+        const y1 = -(v1Screen.y * 0.5 - 0.5) * h;
+        const x2 = (v2Screen.x * 0.5 + 0.5) * w;
+        const y2 = -(v2Screen.y * 0.5 - 0.5) * h;
+        
+        // Verifica se a linha desenhada cruza com esta aresta
+        const intersection = _getLineIntersection(
+            _lineCutStart.x, _lineCutStart.y,
+            _lineCutEnd.x, _lineCutEnd.y,
+            x1, y1, x2, y2
+        );
+        
+        if (intersection) {
+            // Calcula o fator (0-1) onde a intersecção ocorre na aresta
+            const edgeLen = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+            const distToIntersect = Math.sqrt(
+                (intersection.x - x1) ** 2 + 
+                (intersection.y - y1) ** 2
+            );
+            
+            let t = edgeLen > 0 ? distToIntersect / edgeLen : 0.5;
+            
+            // Clamp para segurança
+            t = Math.max(0.01, Math.min(0.99, t));
+            
+            crossedEdges.set(eIdx, t);
+        }
+    }
+    
+    // 2. Se não encontrou nenhuma aresta, cancela
+    if (crossedEdges.size === 0) {
+        console.log("⚠️ Nenhuma aresta encontrada no traço.");
+        if (_lineCutCtx) _lineCutCtx.clearRect(0, 0, _lineCutCanvas.width, _lineCutCanvas.height);
+        desativarLineCut();
+        return;
+    }
+    
+    console.log(`✅ Encontradas ${crossedEdges.size} arestas para cortar.`);
+    
+    // 3. Agrupa as arestas cortadas em anéis topológicos contínuos
+    const rings = _lcGroupEdgesIntoRings(crossedEdges);
+    
+    // 4. Aplica o corte em cada anel encontrado
+    const stateBefore = _captureState();
+    
+    rings.forEach(ring => {
+        _lcApplyRingCut(ring.edges, ring.factors);
+    });
+    
+    // 5. Reconstrói geometria
+    reconstruirArestas();
+    invalidarCacheOtimizacao();
+    reconstruirGeometria();
+    atualizarNormais();
+    if (typeof updateBVH === 'function') updateBVH(window.editingMesh);
+    
+    const stateAfter = _captureState();
+    commandManager.execute(new GeometryCommand('Line Cut', stateBefore, stateAfter));
+    
+    console.log(`✅ Corte por traço aplicado (${rings.length} anel(is)).`);
+    
+    // Limpeza
+    if (_lineCutCtx) _lineCutCtx.clearRect(0, 0, _lineCutCanvas.width, _lineCutCanvas.height);
+    desativarLineCut();
+}
+
+/**
+ * Agrupa arestas cortadas em anéis topológicos contínuos.
+ * Retorna array de { edges: [edgeIdx...], factors: Map<edgeIdx, t> }
+ */
+function _lcGroupEdgesIntoRings(crossedEdges) {
+    const rings = [];
+    const visited = new Set();
+    
+    // Para cada aresta cortada, tenta formar um anel
+    for (const [startEdgeIdx, startFactor] of crossedEdges.entries()) {
+        if (visited.has(startEdgeIdx)) continue;
+        
+        const ring = { edges: [], factors: new Map() };
+        const queue = [startEdgeIdx];
+        
+        while (queue.length > 0) {
+            const currIdx = queue.shift();
+            if (visited.has(currIdx)) continue;
+            
+            visited.add(currIdx);
+            ring.edges.push(currIdx);
+            ring.factors.set(currIdx, crossedEdges.get(currIdx));
+            
+            // Encontra faces que compartilham esta aresta
+            const currEdge = edges[currIdx];
+            if (!currEdge) continue;
+            
+            const connectedFaces = faces.filter(f => 
+                f && f.includes(currEdge[0]) && f.includes(currEdge[1])
+            );
+            
+            // Para cada face conectada, procura outras arestas cortadas
+            connectedFaces.forEach(face => {
+                if (face.length !== 4) return; // Apenas quads para topologia de anel
+                
+                const v1 = currEdge[0];
+                const v2 = currEdge[1];
+                const otherVerts = face.filter(v => v !== v1 && v !== v2);
+                
+                if (otherVerts.length === 2) {
+                    const ov1 = otherVerts[0];
+                    const ov2 = otherVerts[1];
+                    const oppIdx = edges.findIndex(e => 
+                        (e[0] === ov1 && e[1] === ov2) || 
+                        (e[0] === ov2 && e[1] === ov1)
+                    );
+                    
+                    if (oppIdx !== -1 && crossedEdges.has(oppIdx) && !visited.has(oppIdx)) {
+                        queue.push(oppIdx);
+                    }
+                }
+            });
+        }
+        
+        if (ring.edges.length > 0) {
+            rings.push(ring);
+        }
+    }
+    
+    return rings;
+}
+
+/**
+ * Aplica o corte em um anel específico com fatores customizados.
+ */
+function _lcApplyRingCut(ringEdges, factorsMap) {
+    if (ringEdges.length === 0) return;
+    
+    const edgeToNewIdx = new Map();
+    
+    // Cria novos vértices em cada aresta cortada
+    ringEdges.forEach(eIdx => {
+        const e = edges[eIdx];
+        if (!e) return;
+        
+        const v1 = uniqueVertices[e[0]];
+        const v2 = uniqueVertices[e[1]];
+        const t = factorsMap.get(eIdx) || 0.5;
+        
+        const newPos = new THREE.Vector3().lerpVectors(v1, v2, t);
+        const newIdx = uniqueVertices.length;
+        uniqueVertices.push(newPos);
+        edgeToNewIdx.set(eIdx, newIdx);
+    });
+    
+    // Divide faces que foram cortadas
+    const newFaces = [];
+    faces.forEach(face => {
+        if (!face) return;
+        
+        const cuts = [];
+        for (let i = 0; i < face.length; i++) {
+            const vA = face[i];
+            const vB = face[(i + 1) % face.length];
+            const eIdx = ringEdges.find(rid => {
+                const e = edges[rid];
+                return e && ((e[0] === vA && e[1] === vB) || (e[0] === vB && e[1] === vA));
+            });
+            if (eIdx !== undefined) {
+                cuts.push({ pos: i, newIdx: edgeToNewIdx.get(eIdx) });
+            }
+        }
+        
+        if (cuts.length === 2) {
+            cuts.sort((a, b) => a.pos - b.pos);
+            const c1 = cuts[0];
+            const c2 = cuts[1];
+            
+            const f1 = [c1.newIdx];
+            for (let k = (c1.pos + 1) % face.length; k !== (c2.pos + 1) % face.length; k = (k + 1) % face.length) {
+                f1.push(face[k]);
+            }
+            f1.push(c2.newIdx);
+            
+            const f2 = [c2.newIdx];
+            for (let k = (c2.pos + 1) % face.length; k !== (c1.pos + 1) % face.length; k = (k + 1) % face.length) {
+                f2.push(face[k]);
+            }
+            f2.push(c1.newIdx);
+            
+            newFaces.push(f1, f2);
+        } else {
+            newFaces.push(face);
+        }
+    });
+    
+    faces.splice(0, faces.length, ...newFaces);
+}
+
+/**
+ * Calcula intersecção entre dois segmentos de linha 2D.
+ * Retorna {x, y} ou null se não há intersecção.
+ */
+function _getLineIntersection(x1, y1, x2, y2, x3, y3, x4, y4) {
+    const denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+    if (Math.abs(denom) < 0.0001) return null; // Linhas paralelas
+    
+    const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
+    const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
+    
+    if (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1) {
+        return {
+            x: x1 + ua * (x2 - x1),
+            y: y1 + ua * (y2 - y1)
+        };
+    }
+    
+    return null;
+}
+
+// Inicializador do Botão
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('loopcut-trass');
+    if (btn) btn.addEventListener('click', ativarLineCut);
+});
