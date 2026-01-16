@@ -60,7 +60,7 @@
 
     // CONFIGURAÇÕES
     const rayConfig = {
-        maxSamples: 10,
+        maxSamples: 100,
         samplesPerFrame: 1,
         maxBounces: 6,
         pixelRatio: 1.0, 
