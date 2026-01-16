@@ -1,5 +1,5 @@
 // configuração temporal inicial
-let t = 2700; // 45 minutos = 2700 segundos
+let t = 27000; // 45 minutos = 2700 segundos
 const d = document.getElementById("timer");
 
 // persistência de estado
